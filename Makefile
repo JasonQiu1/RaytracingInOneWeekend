@@ -10,9 +10,10 @@ BINARYDIR := $(MKFILEDIR)
 BINARYNAME := rtiow
 
 LDFLAGS :=
-CFLAGS := -Wall -g
+CFLAGS := -std=c99 -Wall -g -O2
 RUNFLAGS :=
 
+HEADERS := $(wildcard $(INCLUDEDIR)/*.h)
 SOURCES := $(wildcard $(SOURCEDIR)/*$(SOURCEEXT))
 OBJECTS := $(addprefix $(BUILDDIR)/,$(patsubst %$(SOURCEEXT), %.o, $(SOURCES:$(SOURCEDIR)/%=%)))
 
@@ -21,7 +22,7 @@ $(BINARYDIR)/$(BINARYNAME): $(BUILDDIR) $(OBJECTS) Makefile
 	echo $(OBJECTS)
 	$(CC) $(OBJECTS) -o $(BINARYNAME) $(CFLAGS) $(LDFLAGS) 
 
-$(BUILDDIR)/%.o: $(SOURCEDIR)/%$(SOURCEEXT)
+$(BUILDDIR)/%.o: $(SOURCEDIR)/%$(SOURCEEXT) $(HEADERS)
 	$(CC) -c $< -o $@ $(CFLAGS) $(LDFLAGS) -I$(INCLUDEDIR) 
 
 $(BUILDDIR):

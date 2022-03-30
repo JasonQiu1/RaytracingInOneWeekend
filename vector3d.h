@@ -1,6 +1,8 @@
 #ifndef VECTOR3D_H
 #define VECTOR3D_H
 
+#include <stdio.h>
+
 // 3D vector library with support for basic vector math and 
 // user-created vector operations.
 
@@ -11,89 +13,91 @@ typedef struct Vec3 {
 } Vec3;
 
 // Sets each element of res to op(corresponding elements of a and b).
-// Returns 0 if err(corresponding elements of a and b) returns 1. Otherwise, 1.
-inline int Vec3_OpErr(Vec3* res, const Vec3* a, const Vec3* b, 
-                     double(*op)(double, double), int(*err)(double, double))
+// Returns NULL if err(corresponding elements of a and b) returns 1.
+// Otherwise, returns res.
+inline Vec3* Vec3_opErr(Vec3* res, const Vec3* a, const Vec3* b, 
+                      double(*op)(double, double), int(*err)(double, double))
 {
-    if (err(a->x, b->x) || err(a->y, b->y) || err(a->z, b->z)) return 0;
-    res->x = op(a->x, b->y);
+    if (err(a->x, b->x) || err(a->y, b->y) || err(a->z, b->z)) return NULL;
+    res->x = op(a->x, b->x);
     res->y = op(a->y, b->y);
     res->z = op(a->z, b->z);
-    return 1;
+    return res;
 }
 
 // Sets each element of res to op(corresponding element of vec, s).
-// Returns 0 if err(corresponding element of vec, s) returns 1. Otherwise, 1.
-inline int Vec3_OpErrS(Vec3* res, const Vec3* vec, double s,
-                      double(*op)(double, double), int(*err)(double, double))
+// Returns NULL if err(corresponding element of vec, s) returns 1.
+// Otherwise, returns res;
+inline Vec3* Vec3_opErrS(Vec3* res, const Vec3* vec, double s,
+                       double(*op)(double, double), int(*err)(double, double))
 {
-    if (err(vec->x, s) || err(vec->y, s) || err(vec->z, s)) return 0;
+    if (err(vec->x, s) || err(vec->y, s) || err(vec->z, s)) return NULL;
     res->x = op(vec->x, s);
     res->y = op(vec->y, s);
     res->z = op(vec->z, s);
-    return 1;
+    return res;
 }
 
 // Sets each element of res to op(corresponding elements of a and b).
-inline int Vec3_Op(Vec3* res, const Vec3* a, const Vec3* b, 
-                  double(*op)(double, double)) 
+inline Vec3* Vec3_op(Vec3* res, const Vec3* a, const Vec3* b, 
+                   double(*op)(double, double)) 
 {
-    res->x = op(a->x, b->y);
+    res->x = op(a->x, b->x);
     res->y = op(a->y, b->y);
     res->z = op(a->z, b->z);
-    return 1;
+    return res;
 }
 
 // Sets each element of res to op(corresponding element of vec, s).
-inline int Vec3_OpS(Vec3* res, const Vec3* vec, double s, 
-                   double(*op)(double, double))
+inline Vec3* Vec3_opS(Vec3* res, const Vec3* vec, double s, 
+                    double(*op)(double, double))
 {
     res->x = op(vec->x, s);
     res->y = op(vec->y, s);
     res->z = op(vec->z, s);
-    return 1;
+    return res;
 }
 
 // Sets res to a + b.
-int Vec3_Add(Vec3* res, const Vec3* a, const Vec3* b);
+Vec3* Vec3_add(Vec3* res, const Vec3* a, const Vec3* b);
 
 // Sets res to vec + s.
-int Vec3_AddS(Vec3* res, const Vec3* vec, double s);
+Vec3* Vec3_addS(Vec3* res, const Vec3* vec, double s);
 
 // Sets res to a - b.
-int Vec3_Sub(Vec3* res, const Vec3* a, const Vec3* b);
+Vec3* Vec3_sub(Vec3* res, const Vec3* a, const Vec3* b);
 
 // Sets res to vec - s.
-int Vec3_SubS(Vec3* res, const Vec3* vec, double s);
+Vec3* Vec3_subS(Vec3* res, const Vec3* vec, double s);
 
 // Sets res to a * b.
-int Vec3_Mult(Vec3* res, const Vec3* a, const Vec3* b);
+Vec3* Vec3_mult(Vec3* res, const Vec3* a, const Vec3* b);
 
 // Sets res to vec * s.
-int Vec3_MultS(Vec3* res, const Vec3* vec, double s);
+Vec3* Vec3_multS(Vec3* res, const Vec3* vec, double s);
 
 // Sets res to a / b.
-int Vec3_Div(Vec3* res, const Vec3* a, const Vec3* b);
+Vec3* Vec3_div(Vec3* res, const Vec3* a, const Vec3* b);
 
 // Sets res to vec / s.
-int Vec3_DivS(Vec3* res, const Vec3* vec, double s);
+Vec3* Vec3_divS(Vec3* res, const Vec3* vec, double s);
 
 // Returns the sum of all elements in the vector.
-double Vec3_Sum(const Vec3* vec);
+double Vec3_sum(const Vec3* vec);
 
 // Returns the dot product of A and B.
-double Vec3_Dot(const Vec3* a, const Vec3* b);
+double Vec3_dot(const Vec3* a, const Vec3* b);
 
 // Returns the magnitude squared of a vector.
-double Vec3_MagSqr(const Vec3* vec);
+double Vec3_magSqr(const Vec3* vec);
 
 // Returns the magnitude of a vector.
-double Vec3_Mag(const Vec3* vec);
+double Vec3_mag(const Vec3* vec);
 
 // Sets res to the vector normalized.
-int Vec3_Norm(Vec3* res, Vec3* vec);
+Vec3* Vec3_norm(Vec3* res, const Vec3* vec);
 
 // Prints the vector to the given stream.
-int Vec3_fprintln(Vec3* vec, FILE* stream);
+int Vec3_fprintln(const Vec3* vec, FILE* stream);
 
 #endif
