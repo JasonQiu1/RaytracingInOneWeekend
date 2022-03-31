@@ -1,7 +1,6 @@
 #include <math.h>
 
 #include "sphere.h"
-#include "vector3d.h"
 
 static int SPHERE_hit(Hittable* res, const Hittable* hittable, const Ray* r, 
                       double tMin, double tMax) {
@@ -28,18 +27,16 @@ static int SPHERE_hit(Hittable* res, const Hittable* hittable, const Ray* r,
     Vec3 outwardNormal;
     Vec3_sub(&outwardNormal, &res->point, &s->center);
     Vec3_divS(&outwardNormal, &outwardNormal, s->radius);
-    hittable->setFaceNormal(res, r, &outwardNormal);
+    Hittable_setFaceNormal(res, r, &outwardNormal);
+    res->material = hittable->material; 
 
     return 1;
 }
 
-extern void HITTABLE_setFaceNormal(Hittable* hittable, const Ray* r, 
-                                   const Vec3* outwardNormal);
-
 // Initializes the given sphere.
-Sphere* Sphere_init(Sphere* s, Vec3 center, double radius) {
+Sphere* Sphere_init(Sphere* s, Vec3 center, double radius, Material* material) {
     s->base.hit = SPHERE_hit;
-    s->base.setFaceNormal = HITTABLE_setFaceNormal;
+    s->base.material = material;
     s->center = center;
     s->radius = radius;
     return s;

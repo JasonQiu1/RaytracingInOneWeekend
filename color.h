@@ -9,12 +9,7 @@
 
 typedef Vec3 Color;
 
-int Color_fprintln(Color* c, FILE* stream) {
-    return fprintf(stream, "%i %i %i\n", 
-                   (int)((MAX_COLOR + 0.999) * c->x),
-                   (int)((MAX_COLOR + 0.999) * c->y),
-                   (int)((MAX_COLOR + 0.999) * c->z)
-           );
-}
+// 'spp' is samples per pixel
+int Color_fprintln(FILE* stream, const Color* c, int spp);
 
 #endif
