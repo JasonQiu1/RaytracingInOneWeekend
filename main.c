@@ -39,7 +39,7 @@ Color* Ray_color(Color* res, const Ray* r, const Hittable* world,
 
     double t = 0.5*(dir.y + 1.0); // make y e [0,1]
     Color gradientHigh = {1.0, 1.0, 1.0};
-    Color gradientLow = {0.7, 0.5, 1.0};
+    Color gradientLow = {0.5, 0.7, 1.0};
     Vec3_multS(&gradientHigh, &gradientHigh, (1 - t));
     Vec3_multS(&gradientLow, &gradientLow, t);
     Vec3_add(res, &gradientHigh, &gradientLow);
@@ -58,24 +58,29 @@ int main() {
     // World
     HittableList* world = HittableList_new();
 
-    Lambertian groundMat, centerMat;
-    Metal leftMat, rightMat;
+    Lambertian groundMat;
+    Lambertian centerMat;
+    Dielectric leftMat;
+    Metal rightMat;
 
     Lambertian_init(&groundMat, (Color){0.8,0.8,0.0});
-    Lambertian_init(&centerMat, (Color){0.7,0.3,0.3});
-    Metal_init(&leftMat, (Color){0.8,0.8,0.8}, 0.3);
-    Metal_init(&rightMat, (Color){0.8,0.6,0.2}, 1.0);
+    Lambertian_init(&centerMat, (Color){0.1,0.2,0.5});
+    Dielectric_init(&leftMat, 1.5);
+    Metal_init(&rightMat, (Color){0.8,0.6,0.2}, 0.0);
 
-    Sphere s1, s2, s3, s4;
+    Sphere s1, s2, s3, s4, s5;
 
     Sphere_init(&s1, (Vec3){0,-100.5,-1}, 100, (Material*)&groundMat);
     Sphere_init(&s2, (Vec3){0,0,-1}, 0.5, (Material*)&centerMat);
     Sphere_init(&s3, (Vec3){-1,0,-1}, 0.5, (Material*)&leftMat);
-    Sphere_init(&s4, (Vec3){1,0,-1}, 0.5, (Material*)&rightMat);
+    Sphere_init(&s4, (Vec3){-1,0,-1}, -0.4, (Material*)&leftMat);
+    Sphere_init(&s5, (Vec3){1,0,-1}, 0.5, (Material*)&rightMat);
+
     HittableList_add(world, (Hittable*)&s1);
     HittableList_add(world, (Hittable*)&s2);
     HittableList_add(world, (Hittable*)&s3);
     HittableList_add(world, (Hittable*)&s4);
+    HittableList_add(world, (Hittable*)&s5);
 
     // Camera
     Camera camera;

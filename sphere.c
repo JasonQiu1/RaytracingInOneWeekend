@@ -27,6 +27,7 @@ static int SPHERE_hit(Hittable* res, const Hittable* hittable, const Ray* r,
     Vec3 outwardNormal;
     Vec3_sub(&outwardNormal, &res->point, &s->center);
     Vec3_divS(&outwardNormal, &outwardNormal, s->radius);
+    Vec3_norm(&outwardNormal, &outwardNormal);
     Hittable_setFaceNormal(res, r, &outwardNormal);
     res->material = hittable->material; 
 

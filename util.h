@@ -66,4 +66,8 @@ inline Vec3* Vec3_reflect(Vec3* res, const Vec3* in, const Vec3* normal) {
     return Vec3_sub(res, in, Vec3_multS(res, normal, 2*Vec3_dot(in, normal)));
 }
 
+// snell's law to find refracted vector
+Vec3* Vec3_refract(Vec3* res, const Vec3* in, const Vec3* normal, 
+                   double etaiOverEtat);
+
 #endif
