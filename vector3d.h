@@ -97,6 +97,9 @@ double Vec3_mag(const Vec3* vec);
 // Sets res to the vector normalized.
 Vec3* Vec3_norm(Vec3* res, const Vec3* vec);
 
+// Sets res to the cross product;
+Vec3* Vec3_cross(Vec3* res, const Vec3* a, const Vec3* b);
+
 // Prints the vector to the given stream.
 int Vec3_fprintln(const Vec3* vec, FILE* stream);
 

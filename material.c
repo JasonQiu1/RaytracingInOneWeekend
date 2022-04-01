@@ -7,7 +7,7 @@
 static int LAMBERTIAN_scatteredRay(Ray* res, Color* attenuation, const Ray* in,
                                    const Hittable* h) {
     res->origin = h->point;
-    Vec3_randomInHemisphere(&res->dir, &h->normal);
+    Vec3_randomInUnitSphere(&res->dir);
     Vec3_add(&res->dir, &res->dir, &h->normal);
 
     // Change targets pointing directly down to the normal vector instead.

@@ -36,7 +36,7 @@ void* Vector_at(const Vector* v, size_t idx) {
 
 // Resizes a vector to a given size and returns the vector in the new space.
 Vector* Vector_resize(Vector* v, size_t newSize) {
-    void* newArray = realloc(v->array, newSize);
+    void* newArray = realloc(v->array, newSize * v->width);
     if (newArray == NULL) return NULL;
     v->array = newArray;
     v->size = newSize;

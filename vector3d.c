@@ -88,12 +88,12 @@ double Vec3_sum(const Vec3* vec) {
 }
 
 // Returns the dot product of A and B.
-double Vec3_dot(const Vec3* a, const Vec3* b) {
+inline double Vec3_dot(const Vec3* a, const Vec3* b) {
     return (a->x * b->x) + (a->y * b->y) + (a->z * b->z);
 }
 
 // Returns the magnitude squared of a vector.
-double Vec3_magSqr(const Vec3* vec) {
+inline double Vec3_magSqr(const Vec3* vec) {
     return Vec3_dot(vec, vec);
 }
 
@@ -105,6 +105,14 @@ double Vec3_mag(const Vec3* vec) {
 // Sets res to the vector normalized.
 Vec3* Vec3_norm(Vec3* res, const Vec3* vec) {
     return Vec3_divS(res, vec, Vec3_mag(vec));
+}
+
+// Sets res to the cross product.
+Vec3* Vec3_cross(Vec3* res, const Vec3* a, const Vec3* b) {
+    res->x = (a->y*b->z) - (a->z*b->y);
+    res->y = (a->z*b->x) - (a->x*b->z);
+    res->z = (a->z*b->y) - (a->y*b->x);
+    return res;
 }
 
 // Prints the vector to the given stream.

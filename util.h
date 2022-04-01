@@ -40,6 +40,15 @@ inline Vec3* Vec3_randomRange(Vec3* res, double min, double max) {
     return res;
 }
 
+inline Vec3* Vec3_randomInUnitDisk(Vec3* res) {
+    do {
+        res->x = randomDoubleRange(-1,1);
+        res->y = randomDoubleRange(-1,1);
+        res->z = 0;
+    } while (Vec3_magSqr(res) >= 1);
+    return res;
+}
+
 inline Vec3* Vec3_randomInUnitSphere(Vec3* res) {
     do {
         Vec3_randomRange(res, -1, 1);
