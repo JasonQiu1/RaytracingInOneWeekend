@@ -9,6 +9,9 @@
 
 typedef Vec3 Color;
 
+// Processes a color, adding gamma and clamping it, etc.
+Color* Color_process(Color* c, int spp);
+
 // 'spp' is samples per pixel
 int Color_fprintln(FILE* stream, const Color* c, int spp);
 

@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <omp.h>
+
 #include "camera.h"
 #include "color.h"
 #include "hittable.h"
@@ -129,13 +131,23 @@ HittableList* randomScene(Vector* pMaterials) {
     return world;
 }
 
+#pragma omp declare reduction(Vec3_add : Color : \
+        Vec3_add(&omp_out, &omp_out, &omp_in)) \
+    initializer( omp_priv = { 0, 0, 0 } )
+
+// Image
+#define ASPECTRATIOW 16
+#define ASPECTRATIOH 9
+#define ASPECTRATIO (16.0 / 9.0)
+#define IMAGEWIDTH 1200
+#define IMAGEHEIGHT (IMAGEWIDTH * ASPECTRATIOH / ASPECTRATIOW)
+
+// Image array
+Color image[IMAGEHEIGHT][IMAGEWIDTH];
+
 int main() {
-    // Image
-    const double aspectRatio = 16.0 / 9.0;
-    const int imageWidth = 1200;
-    const int imageHeight = imageWidth / aspectRatio;
     // samples per pixel
-    const int spp = 10;
+    const int spp = 100;
     const int maxBounces = 50;
 
     // World
@@ -147,29 +159,43 @@ int main() {
     Vec3 lookFrom = {13,2,3}, lookAt = {0,0,0}, temp;
     Vec3_sub(&temp, &lookAt, &lookFrom);
     double focusDist = 10;
-    Camera_init(&camera, lookFrom, lookAt, (Vec3){0,1,0}, 20, aspectRatio, 0.1,
+    Camera_init(&camera, lookFrom, lookAt, (Vec3){0,1,0}, 20, ASPECTRATIO, 0.1,
                 focusDist);
 
     // Render
-    printf("P3\n%i %i\n%i\n", imageWidth, imageHeight, MAX_COLOR);
+    printf("P3\n%i %i\n%i\n", IMAGEWIDTH, IMAGEHEIGHT, MAX_COLOR);
 
-    double u, v;
-    Ray r;
-    Color color, curr;
-    for (int i = imageHeight-1; i >= 0; i--) {
-        fprintf(stderr, "Rows remaining: %5i\r", i);
-        fflush(stderr);
-        for (int j = 0; j < imageWidth; j++) {
-            color = (Color){0,0,0};
+    int rowsLeft = IMAGEHEIGHT;
+    omp_set_dynamic(0);
+    omp_set_num_threads(omp_get_num_procs());
+    #pragma omp parallel for
+    for (int i = IMAGEHEIGHT-1; i >= 0; i--) {
+        #pragma omp parallel for
+        for (int j = 0; j < IMAGEWIDTH; j++) {
+            Color color = { 0, 0, 0 };
+            #pragma omp parallel for reduction(Vec3_add:color)
             for (int s = 0; s < spp; s++) {
-                u = (j + randomDouble()) / (imageWidth - 1);
-                v = (i + randomDouble()) / (imageHeight - 1);
+                Color curr;
+                Ray r;
+                double u = (j + randomDouble()) / (IMAGEWIDTH - 1);
+                double v = (i + randomDouble()) / (IMAGEHEIGHT - 1);
                 Camera_getRay(&r, &camera, u, v);
                 Ray_color(&curr, &r, (Hittable*)world, maxBounces);
                 Vec3_add(&color, &color, &curr);
             }
 
-            Color_fprintln(stdout, &color, spp);
+            image[i][j] = color;
+        }
+
+        #pragma omp atomic
+        rowsLeft--;
+        fprintf(stderr, "Rows remaining: %5i\r", rowsLeft);
+        fflush(stderr);
+    }
+
+    for (int i = IMAGEHEIGHT-1; i >= 0; i--) {
+        for (int j = 0; j < IMAGEWIDTH; j++) {
+            Color_fprintln(stdout, &image[i][j], spp);
         }
     }
 
