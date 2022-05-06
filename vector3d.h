@@ -82,6 +82,12 @@ Vec3* Vec3_div(Vec3* res, const Vec3* a, const Vec3* b);
 // Sets res to vec / s.
 Vec3* Vec3_divS(Vec3* res, const Vec3* vec, double s);
 
+// Sets res to min(x, y) for each element of a and b.
+Vec3* Vec3_lt(Vec3* res, const Vec3* a, const Vec3* b);
+
+// Sets res to max(x, y) for each element of a and b.
+Vec3* Vec3_gt(Vec3* res, const Vec3* a, const Vec3* b);
+
 // Returns the sum of all elements in the vector.
 double Vec3_sum(const Vec3* vec);
 
@@ -93,6 +99,10 @@ double Vec3_magSqr(const Vec3* vec);
 
 // Returns the magnitude of a vector.
 double Vec3_mag(const Vec3* vec);
+
+// Returns the corresponding index of the Vec3 object.
+// Aborts if index is negative or above 2.
+double Vec3_at(const Vec3* vec, size_t idx);
 
 // Sets res to the vector normalized.
 Vec3* Vec3_norm(Vec3* res, const Vec3* vec);

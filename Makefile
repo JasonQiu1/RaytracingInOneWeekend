@@ -10,7 +10,7 @@ BINARYDIR := $(MKFILEDIR)
 BINARYNAME := rtiow
 
 LDFLAGS :=
-CFLAGS := -std=c99 -Wall -O3 -g
+CFLAGS := -std=c99 -Wall -g -O3
 RUNFLAGS :=
 
 HEADERS := $(wildcard $(INCLUDEDIR)/*.h)

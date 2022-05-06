@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "vector3d.h"
 
@@ -82,6 +83,24 @@ Vec3* Vec3_divS(Vec3* res, const Vec3* vec, double s) {
     return Vec3_opErrS(res, vec, s, OP_div, ERR_bIsZero);
 }
 
+static inline double OP_lt(double a, double b) {
+    return a < b ? a : b;
+}
+
+// Sets res to min(x, y) for each element of a and b.
+Vec3* Vec3_lt(Vec3* res, const Vec3* a, const Vec3* b) {
+    return Vec3_op(res, a, b, OP_lt);
+}
+
+static inline double OP_gt(double a, double b) {
+    return a > b ? a : b;
+}
+
+// Sets res to max(x, y) for each element of a and b.
+Vec3* Vec3_gt(Vec3* res, const Vec3* a, const Vec3* b) {
+    return Vec3_op(res, a, b, OP_gt);
+}
+
 // Returns the sum of all elements in the vector.
 double Vec3_sum(const Vec3* vec) {
     return vec->x + vec->y + vec->z;
@@ -100,6 +119,20 @@ inline double Vec3_magSqr(const Vec3* vec) {
 // Returns the magnitude of a vector.
 double Vec3_mag(const Vec3* vec) {
     return sqrt(Vec3_magSqr(vec));
+}
+
+// Returns the corresponding index of the Vec3 object.
+// Aborts if index is negative or above 2.
+double Vec3_at(const Vec3* vec, size_t idx) {
+    if (idx == 0) {
+        return vec->x;
+    } else if (idx == 1) {
+        return vec->y;
+    } else if (idx == 2) {
+        return vec->z;
+    }
+
+    exit(-1);
 }
 
 // Sets res to the vector normalized.

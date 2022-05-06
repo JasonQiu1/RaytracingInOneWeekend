@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "bvh.h"
 #include "camera.h"
 #include "color.h"
 #include "hittable.h"
@@ -47,15 +48,16 @@ Color* Ray_color(Color* res, const Ray* r, const Hittable* world,
     return res;
 }
 
-HittableList* randomScene(Vector* pMaterials) {
+HittableList* randomScene(Vector* objects, Vector* materials) {
     HittableList* world = HittableList_new();
+
     Lambertian* groundMat = malloc(sizeof *groundMat);
-    Vector_push(pMaterials, groundMat);
+    Vector_push(materials, groundMat);
     Lambertian_init(groundMat, (Color){0.5,0.5,0.5});
 
     Sphere* ground = malloc(sizeof *ground);
     Sphere_init(ground, (Vec3){0,-1000,0}, 1000, (Material*)groundMat);
-    HittableList_add(world, (Hittable*)ground);
+    Vector_push(objects, (Hittable*)ground);
     
     Vec3 spot = {4,0.2,0}, os, rand1, rand2;
     for (int x = -11; x < 11; x++) {
@@ -71,60 +73,63 @@ HittableList* randomScene(Vector* pMaterials) {
                     Vec3_mult(&rand1, &rand1, &rand2);
 
                     Lambertian* mat = malloc(sizeof *mat);
-                    Vector_push(pMaterials, mat);
+                    Vector_push(materials, mat);
                     Lambertian_init(mat, rand1);
 
                     Sphere* sph = malloc(sizeof *sph);
                     Sphere_init(sph, center, 0.2, (Material*)mat);
-                    HittableList_add(world, (Hittable*)sph);
+                    Vector_push(objects, (Hittable*)sph);
                 } else if (chooseMat < 0.95) {
                     // metal
                     Vec3_randomRange(&rand1, 0.5, 1);
 
                     Metal* mat = malloc(sizeof *mat);
-                    Vector_push(pMaterials, mat);
+                    Vector_push(materials, mat);
                     Metal_init(mat, rand1, randomDouble());
 
                     Sphere* sph = malloc(sizeof *sph);
                     Sphere_init(sph, center, 0.2, (Material*)mat);
-                    HittableList_add(world, (Hittable*)sph);
+                    Vector_push(objects, (Hittable*)sph);
                 } else {
                     // glass
                     Dielectric* mat = malloc(sizeof *mat);
-                    Vector_push(pMaterials, mat);
+                    Vector_push(materials, mat);
                     Dielectric_init(mat, 1.5);
 
                     Sphere* sph = malloc(sizeof *sph);
                     Sphere_init(sph, center, 0.2, (Material*)mat);
-                    HittableList_add(world, (Hittable*)sph);
+                    Vector_push(objects, (Hittable*)sph);
                 }
             }
         }
     }
 
     Dielectric* m1 = malloc(sizeof *m1);
-    Vector_push(pMaterials, m1);
+    Vector_push(materials, m1);
     Dielectric_init(m1, 1.5);
 
     Sphere* s1 = malloc(sizeof *s1);
     Sphere_init(s1, (Vec3){0,1,0}, 1.0, (Material*)m1);
-    HittableList_add(world, (Hittable*)s1);
+    Vector_push(objects, (Hittable*)s1);
 
     Lambertian* m2 = malloc(sizeof *m2);
-    Vector_push(pMaterials, m2);
+    Vector_push(materials, m2);
     Lambertian_init(m2, (Color){0.4,0.2,0.1});
 
     Sphere* s2 = malloc(sizeof *s2);
     Sphere_init(s2, (Vec3){-4,1,0}, 1.0, (Material*)m2);
-    HittableList_add(world, (Hittable*)s2);
+    Vector_push(objects, (Hittable*)s2);
 
     Metal* m3 = malloc(sizeof *m3);
-    Vector_push(pMaterials, m3);
+    Vector_push(materials, m3);
     Metal_init(m3, (Color){0.7,0.6,0.5},0.0);
 
     Sphere* s3 = malloc(sizeof *s3);
     Sphere_init(s3, (Vec3){4,1,0}, 1.0, (Material*)m3);
-    HittableList_add(world, (Hittable*)s3);
+    Vector_push(objects, (Hittable*)s3);
+
+    BVH* everything = BVH_new(objects, 0, objects->length, 0, 0);
+    HittableList_add(world, (Hittable*)everything);
 
     return world;
 }
@@ -139,8 +144,9 @@ int main() {
     const int maxBounces = 50;
 
     // World
-    Vector* pMaterials = Vector_new(8, sizeof(Material*));
-    HittableList* world = randomScene(pMaterials);
+    Vector* objects = Vector_new(8, sizeof(Hittable*));
+    Vector* materials = Vector_new(8, sizeof(Material*));
+    HittableList* world = randomScene(objects, materials);
 
     // Camera
     Camera camera;
