@@ -1,6 +1,7 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
+#include "aabb.h"
 #include "material.h"
 #include "ray.h"
 #include "vector3d.h"
@@ -10,6 +11,7 @@ typedef struct Material Material;
 typedef struct Hittable Hittable;
 struct Hittable {
     int(*hit)(Hittable*, const Hittable*, const Ray*, double, double);
+    int(*boundingBox)(AABB*, const Hittable*, double t0, double t1);
     Vec3 point;
     Vec3 normal;
     Material* material;
